@@ -20,22 +20,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
 
+  // Check for stored user on mount
   useEffect(() => {
-    const initializeAuth = async () => {
+    const checkStoredUser = () => {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         try {
           const userObj = JSON.parse(storedUser);
           setUser(userObj);
           setIsAuthenticated(true);
-          
-          // Verify token validity
-          try {
-            await api.getProfile(userObj._id);
-          } catch (error) {
-            console.error('Token validation error:', error);
-            logout();
-          }
         } catch (error) {
           console.error('Error parsing stored user:', error);
           localStorage.removeItem('user');
@@ -44,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     };
 
-    initializeAuth();
+    checkStoredUser();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -61,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Login error:', error);
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials",
+        description: error instanceof Error ? error.message : "Invalid email or password",
         variant: "destructive",
       });
       throw error;
@@ -78,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       toast({
         title: "Registration successful",
-        description: "Your account has been created!",
+        description: "Your account has been created with a default profile!",
       });
     } catch (error) {
       console.error('Signup error:', error);
