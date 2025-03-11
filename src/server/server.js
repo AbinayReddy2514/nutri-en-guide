@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // In production, use a secure environment variable
 
 // MongoDB Connection
-const MONGODB_URI = "mongodb+srv://abinayreddy2:reddy123@nguide.qffw4.mongodb.net/";
+const MONGODB_URI = "mongodb+srv://abinayreddy2:reddy123@nguide.qffw4.mongodb.net/nutrienguide";
 
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI)
@@ -27,13 +27,13 @@ const userSchema = new mongoose.Schema({
 
 const profileSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  age: { type: Number },
-  gender: { type: String, enum: ['male', 'female', 'other'] },
-  height: { type: Number }, // in cm
-  weight: { type: Number }, // in kg
+  age: { type: Number, default: 30 },
+  gender: { type: String, enum: ['male', 'female', 'other'], default: 'male' },
+  height: { type: Number, default: 170 }, // in cm
+  weight: { type: Number, default: 70 }, // in kg
   dietaryPreferences: [String],
   healthGoals: [String],
-  activityLevel: { type: String, enum: ['sedentary', 'light', 'moderate', 'active', 'very active'] },
+  activityLevel: { type: String, enum: ['sedentary', 'light', 'moderate', 'active', 'very active'], default: 'moderate' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -86,7 +86,14 @@ app.post('/api/auth/signup', async (req, res) => {
     await newUser.save();
     
     // Generate JWT token
-    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '30d' }); // Extended token expiration to 30 days
+    
+    // Create default profile for the user
+    const newProfile = new Profile({
+      userId: newUser._id
+    });
+    
+    await newProfile.save();
     
     res.status(201).json({
       _id: newUser._id,
@@ -118,7 +125,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
     
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '30d' }); // Extended token expiration to 30 days
     
     res.json({
       _id: user._id,
