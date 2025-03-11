@@ -2,9 +2,12 @@
 import axios from 'axios';
 import { User, UserProfile, DailyPlan } from '../types';
 
+// MongoDB Connection URL (in a real production app, this would be in an environment variable)
+const MONGODB_URI = "mongodb+srv://abinayreddy2:reddy123@nguide.qffw4.mongodb.net/";
+
 // Create an axios instance for making API calls
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api', // Updated to include the full server URL
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -30,8 +33,6 @@ const api = {
   login: async (email: string, password: string): Promise<User> => {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
-      // Store user data in localStorage for persistence
-      localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       console.error('Login error:', error);
@@ -42,8 +43,6 @@ const api = {
   signup: async (name: string, email: string, password: string): Promise<User> => {
     try {
       const response = await apiClient.post('/auth/signup', { name, email, password });
-      // Store user data in localStorage for persistence
-      localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       console.error('Signup error:', error);

@@ -20,24 +20,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
 
-  // Check for stored user on mount
   useEffect(() => {
-    const checkStoredUser = () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const userObj = JSON.parse(storedUser);
-          setUser(userObj);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error('Error parsing stored user:', error);
-          localStorage.removeItem('user');
-        }
+    // Check if user is stored in localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        setUser(userObj);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('user');
       }
-      setLoading(false);
-    };
-
-    checkStoredUser();
+    }
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -46,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userData = await api.login(email, password);
       setUser(userData);
       setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(userData));
       toast({
         title: "Login successful",
         description: `Welcome back, ${userData.name}!`,
@@ -69,9 +66,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userData = await api.signup(name, email, password);
       setUser(userData);
       setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(userData));
       toast({
         title: "Registration successful",
-        description: "Your account has been created with a default profile!",
+        description: "Your account has been created!",
       });
     } catch (error) {
       console.error('Signup error:', error);
