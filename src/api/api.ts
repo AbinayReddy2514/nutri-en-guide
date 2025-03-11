@@ -1,9 +1,10 @@
+
 import axios from 'axios';
 import { User, UserProfile, DailyPlan } from '../types';
 
 // Create an axios instance for making API calls
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://nutrienguide-server.lovable.dev/api', // Updated server URL
   headers: {
     'Content-Type': 'application/json',
   },
