@@ -25,6 +25,21 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Add response interceptor to handle token expiration
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If we get a 401 Unauthorized error, the token might be expired
+    if (error.response && error.response.status === 401) {
+      // Clear the stored user data
+      localStorage.removeItem('user');
+      // Redirect to login page
+      window.location.href = '/auth/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 const api = {
   // Authentication
   login: async (email: string, password: string): Promise<User> => {
