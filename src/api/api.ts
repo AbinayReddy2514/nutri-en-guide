@@ -2,98 +2,94 @@
 import axios from 'axios';
 import { User, UserProfile, DailyPlan } from '../types';
 
-// This is a mock API service that simulates backend responses
-// In a real application, replace this with actual API calls to your MongoDB backend
+// MongoDB Connection URL (in a real production app, this would be in an environment variable)
+const MONGODB_URI = "mongodb+srv://abinayreddy2:reddy123@nguide.qffw4.mongodb.net/";
 
-// Mock data storage
-let users: User[] = [];
-let profiles: UserProfile[] = [];
-let tokens: Record<string, string> = {};
+// Create an axios instance for making API calls
+const apiClient = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add interceptor to add auth token to requests
+apiClient.interceptors.request.use(
+  (config) => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      const { token } = JSON.parse(user);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 const api = {
   // Authentication
   login: async (email: string, password: string): Promise<User> => {
-    // In a real app, this would be a backend call
-    const user = users.find(u => u.email === email);
-    
-    if (!user) {
-      throw new Error('User not found');
+    try {
+      const response = await apiClient.post('/auth/login', { email, password });
+      return response.data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to login');
     }
-    
-    // In a real app, you would verify the password with bcrypt
-    const token = `mock-jwt-token-${Date.now()}`;
-    tokens[user._id!] = token;
-    
-    return { ...user, token };
   },
   
   signup: async (name: string, email: string, password: string): Promise<User> => {
-    // In a real app, this would be a backend call
-    const existingUser = users.find(u => u.email === email);
-    
-    if (existingUser) {
-      throw new Error('Email already in use');
+    try {
+      const response = await apiClient.post('/auth/signup', { name, email, password });
+      return response.data;
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create account');
     }
-    
-    const newUser: User = {
-      _id: `user-${Date.now()}`,
-      name,
-      email,
-    };
-    
-    users.push(newUser);
-    
-    const token = `mock-jwt-token-${Date.now()}`;
-    tokens[newUser._id!] = token;
-    
-    return { ...newUser, token };
   },
   
   // Profile
   getProfile: async (userId: string): Promise<UserProfile | null> => {
-    const profile = profiles.find(p => p.userId === userId);
-    return profile || null;
+    try {
+      const response = await apiClient.get(`/profiles/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get profile error:', error);
+      return null;
+    }
   },
   
   createProfile: async (profile: UserProfile): Promise<UserProfile> => {
-    const newProfile = {
-      ...profile,
-      _id: `profile-${Date.now()}`,
-    };
-    
-    profiles.push(newProfile);
-    
-    return newProfile;
+    try {
+      const response = await apiClient.post('/profiles', profile);
+      return response.data;
+    } catch (error) {
+      console.error('Create profile error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create profile');
+    }
   },
   
   updateProfile: async (profileId: string, data: Partial<UserProfile>): Promise<UserProfile> => {
-    const index = profiles.findIndex(p => p._id === profileId);
-    
-    if (index === -1) {
-      throw new Error('Profile not found');
+    try {
+      const response = await apiClient.put(`/profiles/${profileId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update profile');
     }
-    
-    profiles[index] = { ...profiles[index], ...data };
-    
-    return profiles[index];
   },
   
-  // This would use the geminiApi service in a real application
+  // This would use the geminiApi service
   getRecommendations: async (userId: string): Promise<DailyPlan> => {
-    // Simulate fetching data based on the user's profile
-    // In a real app, this would use the Gemini API
-    const mockPlan: DailyPlan = {
-      date: new Date().toISOString().split('T')[0],
-      meals: [],
-      totalNutrients: {
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fat: 0,
-      }
-    };
-    
-    return mockPlan;
+    try {
+      const response = await apiClient.get(`/recommendations/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get recommendations error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to get recommendations');
+    }
   }
 };
 
