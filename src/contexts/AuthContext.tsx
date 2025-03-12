@@ -39,13 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     try {
       const userData = await api.login(email, password);
       setUser(userData);
       setIsAuthenticated(true);
-      return userData;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -54,13 +53,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signup = async (name: string, email: string, password: string) => {
+  const signup = async (name: string, email: string, password: string): Promise<void> => {
     setLoading(true);
     try {
       const userData = await api.signup(name, email, password);
       setUser(userData);
       setIsAuthenticated(true);
-      return userData;
     } catch (error) {
       console.error('Signup error:', error);
       throw error;
