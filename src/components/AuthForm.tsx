@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,12 +88,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       
       navigate('/profile');
     } catch (error: any) {
-      // Extract error message from API response if available
+      // Extract error message
       let message = 'An unknown error occurred';
       
-      if (error.response?.data?.message) {
-        message = error.response.data.message;
-      } else if (error.message) {
+      if (error instanceof Error) {
         message = error.message;
       }
       
