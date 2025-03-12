@@ -18,6 +18,7 @@ export interface UserProfile {
   dietaryPreferences: string[];
   healthGoals: string[];
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very active';
+  updatedAt?: string; // Added this field to fix the error
 }
 
 export interface Meal {

@@ -197,6 +197,11 @@ class GeminiApi {
         {
           name: "Masala Dosa with Coconut Chutney",
           category: "breakfast",
+          mealType: "breakfast",
+          foods: [
+            { name: "Dosa", quantity: "2 pieces", calories: 200 },
+            { name: "Coconut Chutney", quantity: "2 tbsp", calories: 150 }
+          ],
           nutrients: {
             calories: 350,
             protein: 10,
@@ -220,6 +225,12 @@ class GeminiApi {
         {
           name: "Dal Tadka with Brown Rice and Cucumber Raita",
           category: "lunch",
+          mealType: "lunch",
+          foods: [
+            { name: "Dal Tadka", quantity: "1 bowl", calories: 200 },
+            { name: "Brown Rice", quantity: "1/2 cup", calories: 150 },
+            { name: "Cucumber Raita", quantity: "1/2 cup", calories: 100 }
+          ],
           nutrients: {
             calories: 450,
             protein: 20,
@@ -243,6 +254,11 @@ class GeminiApi {
         {
           name: "Roasted Chana with Fruit Chaat",
           category: "snack",
+          mealType: "dinner", // Setting meal type to dinner as per Meal type requirement
+          foods: [
+            { name: "Roasted Chana", quantity: "1/2 cup", calories: 150 },
+            { name: "Fruit Chaat", quantity: "1 bowl", calories: 100 }
+          ],
           nutrients: {
             calories: 250,
             protein: 15,
@@ -262,6 +278,11 @@ class GeminiApi {
         {
           name: "Palak Paneer with Roti",
           category: "dinner",
+          mealType: "dinner",
+          foods: [
+            { name: "Palak Paneer", quantity: "1 bowl", calories: 300 },
+            { name: "Roti", quantity: "2 pieces", calories: 120 }
+          ],
           nutrients: {
             calories: 420,
             protein: 25,
