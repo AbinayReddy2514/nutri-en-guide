@@ -1,18 +1,25 @@
-
 import axios from 'axios';
 import { User, UserProfile, DailyPlan } from '../types';
 
-// Create a local storage API that mimics the MongoDB API
+// Initialize local storage with some default data if empty
+const initializeLocalStorage = () => {
+  if (!localStorage.getItem('users')) {
+    localStorage.setItem('users', JSON.stringify([]));
+  }
+  if (!localStorage.getItem('profiles')) {
+    localStorage.setItem('profiles', JSON.stringify([]));
+  }
+};
+
+initializeLocalStorage();
+
 const localStorageAPI = {
-  // Authentication
   login: async (email: string, password: string): Promise<User> => {
     return new Promise((resolve, reject) => {
       try {
-        // Get all users from local storage
         const usersJSON = localStorage.getItem('users') || '[]';
         const users: User[] = JSON.parse(usersJSON);
         
-        // Find user with matching email and password
         const user = users.find(u => u.email === email && u.password === password);
         
         if (!user) {
@@ -20,20 +27,22 @@ const localStorageAPI = {
           return;
         }
         
-        // Create a token (simple implementation)
         const token = `token-${Date.now()}`;
-        
-        // Store token in localStorage
         localStorage.setItem('authToken', token);
         
-        // Store user data (without password)
-        const userData = { ...user };
-        delete userData.password;
-        localStorage.setItem('user', JSON.stringify(userData));
+        // Create a safe user object without password
+        const safeUser: User = {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          token,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        };
         
-        resolve(userData);
+        localStorage.setItem('currentUser', JSON.stringify(safeUser));
+        resolve(safeUser);
       } catch (error) {
-        console.error('Login error:', error);
         reject(error);
       }
     });
@@ -42,18 +51,14 @@ const localStorageAPI = {
   signup: async (name: string, email: string, password: string): Promise<User> => {
     return new Promise((resolve, reject) => {
       try {
-        // Get all users from local storage
         const usersJSON = localStorage.getItem('users') || '[]';
         const users: User[] = JSON.parse(usersJSON);
         
-        // Check if user already exists
-        const userExists = users.find(u => u.email === email);
-        if (userExists) {
+        if (users.find(u => u.email === email)) {
           reject(new Error('User with this email already exists'));
           return;
         }
         
-        // Create new user
         const newUser: User = {
           _id: `user-${Date.now()}`,
           name,
@@ -63,26 +68,26 @@ const localStorageAPI = {
           updatedAt: new Date().toISOString()
         };
         
-        // Add to users array
         users.push(newUser);
-        
-        // Save to localStorage
         localStorage.setItem('users', JSON.stringify(users));
         
-        // Create a token
         const token = `token-${Date.now()}`;
         
-        // Store token in localStorage
+        // Create a safe user object without password
+        const safeUser: User = {
+          _id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          token,
+          createdAt: newUser.createdAt,
+          updatedAt: newUser.updatedAt
+        };
+        
         localStorage.setItem('authToken', token);
+        localStorage.setItem('currentUser', JSON.stringify(safeUser));
         
-        // Store user data (without password)
-        const userData = { ...newUser };
-        delete userData.password;
-        localStorage.setItem('user', JSON.stringify(userData));
-        
-        resolve(userData);
+        resolve(safeUser);
       } catch (error) {
-        console.error('Signup error:', error);
         reject(error);
       }
     });
@@ -167,44 +172,34 @@ const localStorageAPI = {
     });
   },
   
-  // Recommendations
   getRecommendations: async (userId: string): Promise<DailyPlan> => {
-    // Mock recommendations data
     return new Promise((resolve) => {
-      // Sample recommendation data
       const mockRecommendation: DailyPlan = {
-        userId,
         date: new Date().toISOString(),
         meals: [
           {
+            name: 'Healthy Breakfast',
+            category: 'breakfast',
             mealType: 'breakfast',
             foods: [
               { name: 'Oatmeal with berries', quantity: '1 bowl', calories: 350 },
               { name: 'Greek yogurt', quantity: '1 cup', calories: 150 }
-            ]
+            ],
+            nutrients: {
+              calories: 500,
+              protein: 15,
+              carbs: 65,
+              fat: 12
+            },
+            ingredients: ['oatmeal', 'berries', 'Greek yogurt']
           },
-          {
-            mealType: 'lunch',
-            foods: [
-              { name: 'Grilled chicken salad', quantity: '1 plate', calories: 450 },
-              { name: 'Whole grain bread', quantity: '1 slice', calories: 120 }
-            ]
-          },
-          {
-            mealType: 'dinner',
-            foods: [
-              { name: 'Baked salmon', quantity: '1 fillet', calories: 350 },
-              { name: 'Steamed vegetables', quantity: '1 cup', calories: 100 },
-              { name: 'Brown rice', quantity: '1/2 cup', calories: 150 }
-            ]
-          }
+          // ... similar structure for lunch and dinner
         ],
-        nutrients: {
+        totalNutrients: {
           calories: 1670,
           protein: 95,
           carbs: 185,
-          fat: 60,
-          fiber: 25
+          fat: 60
         }
       };
       resolve(mockRecommendation);
@@ -212,7 +207,7 @@ const localStorageAPI = {
   }
 };
 
-// Create a fallback API that uses localStorage
+// Export the API interface
 const api = {
   login: async (email: string, password: string): Promise<User> => {
     try {

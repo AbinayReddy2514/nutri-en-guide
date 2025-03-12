@@ -1,9 +1,11 @@
-
 export interface User {
   _id?: string;
   name: string;
   email: string;
+  password?: string; // Optional because we don't want to expose it in all contexts
   token?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UserProfile {
@@ -21,6 +23,12 @@ export interface UserProfile {
 export interface Meal {
   name: string;
   category: 'breakfast' | 'lunch' | 'snack' | 'dinner';
+  mealType: 'breakfast' | 'lunch' | 'dinner';
+  foods: Array<{
+    name: string;
+    quantity: string;
+    calories: number;
+  }>;
   nutrients: {
     calories: number;
     protein: number;
