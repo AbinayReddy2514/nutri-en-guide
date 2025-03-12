@@ -83,15 +83,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         await signup(formData.name, formData.email, formData.password);
         toast({
           title: 'Success',
-          description: 'Your account has been created',
+          description: 'Your account has been created successfully',
         });
       }
       
       navigate('/profile');
-    } catch (error) {
+    } catch (error: any) {
+      // Extract error message from API response if available
       let message = 'An unknown error occurred';
       
-      if (error instanceof Error) {
+      if (error.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error.message) {
         message = error.message;
       }
       
