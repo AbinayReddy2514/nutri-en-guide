@@ -199,17 +199,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         </Button>
       </form>
       
-      <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          {type === 'login' ? "Don't have an account? " : "Already have an account? "}
-          <a
-            href={type === 'login' ? '/auth/signup' : '/auth/login'}
-            className="text-primary font-medium hover:underline"
-          >
-            {type === 'login' ? 'Sign up' : 'Sign in'}
-          </a>
-        </p>
-      </div>
+      
     </div>
   );
 };
