@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Meal } from '@/types';
 import Button from './Button';
@@ -41,6 +40,13 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ meal }) => {
   
   const { label, bgColor, borderColor } = categoryInfo[meal.category];
   
+  // Handler to open YouTube search in new tab
+  const handleYouTubeSearch = () => {
+    const query = encodeURIComponent(meal.name);
+    const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
+    window.open(youtubeUrl, '_blank');
+  };
+  
   return (
     <>
       <div className={`rounded-xl ${bgColor} border ${borderColor} overflow-hidden transition-all duration-300 hover:shadow-md card-hover`}>
@@ -50,20 +56,18 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ meal }) => {
             {label}
           </span>
           
-          {/* Meal name */}
-          <h3 className="text-xl font-semibold mb-3">{meal.name}</h3>
-           {/* YouTube search button */}
-  <button
-    onClick={() => {
-      const query = encodeURIComponent(meal.name);
-      const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
-      window.open(youtubeUrl, "_blank");
-    }}
-    className="px-3 py-1 text-sm font-medium text-red-600 border border-red-600 rounded hover:bg-red-100 transition"
-    type="button"
-  >
-    YouTube
-  </button>
+          {/* Meal name and YouTube button */}
+          <div className="flex items-center mb-3 space-x-3">
+            <h3 className="text-xl font-semibold">{meal.name}</h3>
+            <button
+              onClick={handleYouTubeSearch}
+              type="button"
+              className="px-3 py-1 text-sm font-medium text-red-600 border border-red-600 rounded hover:bg-red-100 transition"
+              aria-label={`Search ${meal.name} on YouTube`}
+            >
+              YouTube
+            </button>
+          </div>
           
           {/* Nutrient info */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
