@@ -208,7 +208,7 @@ const ProfileForm: React.FC = () => {
                 id="age"
                 name="age"
                 type="number"
-                min="1"
+                min="8"
                 max="120"
                 value={profile.age}
                 onChange={handleInputChange}
@@ -263,7 +263,7 @@ const ProfileForm: React.FC = () => {
                 name="height"
                 type="number"
                 min="50"
-                max="250"
+                max="200"
                 value={profile.height}
                 onChange={handleInputChange}
                 className="input-field"
@@ -279,7 +279,7 @@ const ProfileForm: React.FC = () => {
                 name="weight"
                 type="number"
                 min="20"
-                max="250"
+                max="280"
                 value={profile.weight}
                 onChange={handleInputChange}
                 className="input-field"
